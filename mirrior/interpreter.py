@@ -1,20 +1,22 @@
-import pointer
 import utils
 import functions
 
-def operator(op, stack):
-  rv = None
-  if op == "==":
-    rv = not stack.pop(-1) == stack.pop(-1)
-  elif op == "=!":
-    rv = not stack.pop(-1) != stack.pop(-1)
-  elif op == "=<":
-    rv = not stack.pop(-1) < stack.pop(-1)
-  elif op == "=>":
-    rv = not stack.pop(-1) > stack.pop(-1)
+def operator(op, stack, pos):
+  if len(stack) >= 2:
+    rv = None
+    if op == "==":
+      rv = not stack.pop(-1) == stack.pop(-1)
+    elif op == "=!":
+      rv = not stack.pop(-1) != stack.pop(-1)
+    elif op == "=<":
+      rv = not stack.pop(-1) < stack.pop(-1)
+    elif op == "=>":
+      rv = not stack.pop(-1) > stack.pop(-1)
+    else:
+      utils.error(pos, "invalid operator", "value error")
+    return rv
   else:
-    pass # ERROR: that is not a valid operator
-  return rv
+    utils.error(pos, "compare operators need at least 2 values in stack", "stack error")
 
 # sets up so that it will have skipped one character
 def skipnextchar(pntr):
@@ -53,7 +55,7 @@ def run(pntr, variables, stack):
 
     elif recordfunc != None:
       if not char in utils.alphabet:
-        stack = functions.call(recordfunc, stack)
+        stack = functions.call(recordfunc, stack, pntr.pos)
         recordfunc = None
       else:
         recordfunc += char
@@ -62,7 +64,7 @@ def run(pntr, variables, stack):
     elif recordopt != None:
       recordopt += char
       if recordopt in ["==", "=!", "=<", "=>"]:
-        jumpnextchar = operator(recordopt, stack)
+        jumpnextchar = operator(recordopt, stack, pntr.pos)
         recordopt = None
         skip = not jumpnextchar
       else:
@@ -77,9 +79,12 @@ def run(pntr, variables, stack):
         else:
           pass # ERROR: variable does not exist
       elif char == "=": # set var
-        variables[recordvar] = stack.pop(-1)
-        recordvar = None
-        skip = True # this ends the variable
+        if len(stack) >= 1:
+          variables[recordvar] = stack.pop(-1)
+          recordvar = None
+          skip = True # this ends the variable
+        else:
+          utils.error(pntr.pos, "must have 1 item in the stack to set variable", "stack error")
       elif char == "+": # if number will increment by 1
         try:
           variables[recordvar] += 1
@@ -134,7 +139,7 @@ def run(pntr, variables, stack):
       elif char == "=":
         recordopt = "="
       elif char == ":":
-        stack = functions.call("print", stack)
+        stack = functions.call("print", stack, pntr.pos)
       elif char == "[":
         pass
       elif char == "]":

@@ -30,28 +30,31 @@ class pointer(object):
 
     if self.inrange(self.pos[0], self.pos[1]):
       char = self[self.pos[0]:self.pos[1]]
+
+      if char in [" ", "/", "\\", "_", "|", "{", "}"]:
+        self.loopingcheck += 1
+        if self.loopingcheck >= self.maxlooping:
+          utils.error(self.pos, "loop repeated over " + str(self.maxlooping) + " times", "loop error")
+      else:
+        self.loopingcheck = 0
+      
       if char in ["/", "\\", "_",  "|", "{", "}"]:
         if self.allowchange:
-          self.loopingcheck += 1
-          if self.loopingcheck >= self.maxlooping:
-            utils.error(self.pos, "loop repeated over " + str(self.maxlooping) + " times", "loop error")
           self.mirror(char)
           return None # if it was redirected
         else:
-          self.loopingcheck = 0
           return char
       else:
-        self.loopingcheck = 0
         return char
     else:
-      utils.error(self.pos, "pointer tried to access a out of range character", "range error")
+      utils.error(self.pos, "pointer tried to access a out of range character going " + self.direction, "range error")
 
   def __getitem__(self, key):
     # key.start: x    key.stop: y
     if self.inrange(key.start, key.stop):
       return self.program[key.stop][key.start]
     else:
-      utils.error(self.pos, "pointer tried to access a out of range character", "range error")
+      utils.error(self.pos, "pointer tried to access a out of range character going " + self.direction, "range error")
 
   def inrange(self, x, y):
     if y < self.dims[1] and y >= 0:
