@@ -1,4 +1,5 @@
 import sys
+import os
 
 # variables
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
@@ -21,3 +22,9 @@ def stringtype(value):
     return "int"
   elif isinstance(value, int):
     return "float"
+
+def clear():
+  if os.name == "nt":
+    os.system("cls")
+  else:
+    os.system("clear")
