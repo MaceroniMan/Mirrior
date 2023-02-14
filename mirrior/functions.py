@@ -1,42 +1,174 @@
 import utils
 
+# prints the top element of the stack and pops stack
+# outputs nothing
+def out_pop(stack, pntr):
+  if len(stack) >= 1:
+    print(stack.pop(-1))
+    return stack
+  else:
+    utils.error(pntr, "print function needs at least 1 item in stack", "stack error")
+
+# prints the top element of the stack does not pop stack
+# does not print a newline
+def out(stack, pntr):
+  if len(stack) >= 1:
+    print(stack[-1], end="", flush=True)
+    return stack
+  else:
+    utils.error(pntr, "out function needs at least 1 item in stack", "stack error")
+
 # modulos top 2 elements of stack
 # outputs the result of modulo
-def mod(stack, pos):
+def mod(stack, pntr):
   if len(stack) >= 2:
-    return [stack.pop(0) % stack.pop(0)]
-  else:
-    utils.error(pos, "modulo function needs at least 2 items in stack", "stack error")
-
-# prints the top element of the stack
-# outputs nothing
-def out_pop(stack, pos):
-  if len(stack) >= 1:
-    print(stack.pop(0))
+    first = stack.pop(-1)
+    second = stack.pop(-1)
+    try:
+      rvalue = first % second
+    except TypeError:
+      utils.error(pntr, "subtract function cannot be used with both '" + utils.stringtype(first) + "' and '" + utils.stringtype(second) + "'", "type error")
+    stack.append(rvalue)
     return stack
   else:
-    utils.error(pos, "print function needs at least 1 item in stack", "stack error")
-
-# prints the top element of the stack
-# outputs what is just printed
-def out(stack, pos):
-  if len(stack) >= 1:
-    print(stack[0])
-    return stack
-  else:
-    utils.error(pos, "out function needs at least 1 item in stack", "stack error")
-
-fctns = {
-  "mod" : mod,
-  "print" : out_pop,
-  "out" : out
-}
-
-def call(fname, stack, pos):  
-  if fname in fctns:
-    # call function
-    rvalue = fctns[fname](stack, pos)
+    utils.error(pntr, "modulo function needs at least 2 items in stack", "stack error")
     
-    return rvalue
+# adds the top two elements of the stack
+# outputs the result
+def add(stack, pntr):
+  if len(stack) >= 2:
+    first = stack.pop(-1)
+    second = stack.pop(-1)
+    try:
+      rvalue = first + second
+    except TypeError:
+      utils.error(pntr, "subtract function cannot be used with both '" + utils.stringtype(first) + "' and '" + utils.stringtype(second) + "'", "type error")
+    stack.append(rvalue)
+    return stack
   else:
-    return False
+    utils.error(pntr, "add function needs at least 2 items in stack", "stack error")
+
+# subtracts the top two elements of the stack
+# outputs the result
+def subtract(stack, pntr):
+  if len(stack) >= 2:
+    first = stack.pop(-1)
+    second = stack.pop(-1)
+    try:
+      rvalue = first - second
+    except TypeError:
+      utils.error(pntr, "subtract function cannot be used with both '" + utils.stringtype(first) + "' and '" + utils.stringtype(second) + "'", "type error")
+    stack.append(rvalue)
+    return stack
+  else:
+    utils.error(pntr, "subtract function needs at least 2 items in stack", "stack error")
+
+# multiplies the top two elements of the stack
+# outputs the result
+def multiply(stack, pntr):
+  if len(stack) >= 2:
+    first = stack.pop(-1)
+    second = stack.pop(-1)
+    try:
+      rvalue = first * second
+    except TypeError:
+      utils.error(pntr, "multiply function cannot be used with both '" + utils.stringtype(first) + "' and '" + utils.stringtype(second) + "'", "type error")
+    stack.append(rvalue)
+    return stack
+  else:
+    utils.error(pntr, "multiply function needs at least 2 items in stack", "stack error")
+
+# divides the top two elements of the stack
+# outputs the result
+def divide(stack, pntr):
+  if len(stack) >= 2:
+    first = stack.pop(-1)
+    second = stack.pop(-1)
+    try:
+      rvalue = first / second
+    except TypeError:
+      utils.error(pntr, "divide function cannot be used with both '" + utils.stringtype(first) + "' and '" + utils.stringtype(second) + "'", "type error")
+    stack.append(rvalue)
+    return stack
+  else:
+    utils.error(pntr, "divide function needs at least 2 items in stack", "stack error")
+
+# copies the top element of the stack
+# outputs the result
+def copy(stack, pntr):
+  if len(stack) >= 1:
+    stack.append(stack[-1])
+    return stack
+  else:
+    utils.error(pntr, "divide function needs at least 2 items in stack", "stack error")
+
+# shift the top x elements of the stack (x is top element of stack)
+# outputs the result
+def shift_right(stack, pntr):
+  if len(stack) >= 1:
+    shiftnum = stack.pop(-1)
+    if len(stack) >= shiftnum:
+      p = stack[-shiftnum:]
+      return stack[:-shiftnum] + p[1:] + p[:1]
+    else:
+      utils.error(pntr, "shift function needs at least '" + str(shiftnum) + "' more items in stack", "stack error")
+  else:
+    utils.error(pntr, "shift function needs at least 1 item in stack", "stack error")
+
+# shift the top x elements of the stack (x is top element of stack)
+# outputs the result
+def shift_left(stack, pntr):
+  if len(stack) >= 1:
+    shiftnum = stack.pop(-1)
+    if len(stack) >= shiftnum:
+      p = stack[-shiftnum:]
+      return stack[:-shiftnum] + p[-1:] + p[:-1]
+    else:
+      utils.error(pntr, "shift function needs at least '" + str(shiftnum) + "' more items in stack", "stack error")
+  else:
+    utils.error(pntr, "shift function needs at least 1 item in stack", "stack error")
+
+# adds the length of the stack to the stack
+# NOTE: does not include added value
+def length(stack, pntr):
+  stack.append(len(stack))
+  return stack
+
+# prompts the user for a input
+# does auto-type converting
+def prompt(stack, pntr):
+  inpt = input("")
+  try:
+    stack.append(int(inpt))
+  except ValueError:
+    try:
+      stack.append(float(inpt))
+    except ValueError:
+      stack.append(str(inpt))
+  return stack
+
+class fcaller(object):
+  def __init__(self):
+    self.fctns = {
+      "mod" : mod,
+      "print" : out_pop,
+      "out" : out,
+      "add" : add,
+      "subtract" : subtract,
+      "multiply" : multiply,
+      "divide" : divide,
+      "copy" : copy,
+      "shiftright" : shift_right,
+      "shiftleft" : shift_left,
+      "len" : length,
+      "in" : prompt
+    }
+
+  def call(self, name, stack, pntr):
+    if name in self.fctns:
+      # call function
+      rvalue = self.fctns[name](stack, pntr)
+      
+      return rvalue
+    else:
+      return False

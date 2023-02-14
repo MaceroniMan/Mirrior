@@ -1,7 +1,7 @@
 import utils
-import functions
+import copy
 
-def operator(op, stack, pos):
+def operator(op, stack, pntr):
   if len(stack) >= 2:
     rv = None
     if op == "==":
@@ -13,10 +13,10 @@ def operator(op, stack, pos):
     elif op == "=>":
       rv = not stack.pop(-1) > stack.pop(-1)
     else:
-      utils.error(pos, "invalid operator", "value error")
+      utils.error(pntr, "invalid operator", "value error")
     return rv
   else:
-    utils.error(pos, "compare operators need at least 2 values in stack", "stack error")
+    utils.error(pntr, "compare operators need at least 2 values in stack", "stack error")
 
 # sets up so that it will have skipped one character
 def skipnextchar(pntr):
@@ -28,7 +28,7 @@ def skipnextchar(pntr):
 
   pntr.allowchange = True
 
-def run(pntr, variables, stack):
+def run(pntr, variables, stack, functions):
   recordstring = None
   recordfunc = None
   recordopt = None
@@ -41,6 +41,9 @@ def run(pntr, variables, stack):
     char = pntr.next()
     if char == None: # if it was mirrored
       continue
+
+    if len(stack) > 999:
+      utils.error(pntr, "stack cannot exceed 999 values", "stack error")
 
     # respond to current records
     if recordstring != None:
@@ -55,7 +58,7 @@ def run(pntr, variables, stack):
 
     elif recordfunc != None:
       if not char in utils.alphabet:
-        stack = functions.call(recordfunc, stack, pntr.pos)
+        stack = functions.call(recordfunc, stack, pntr)
         recordfunc = None
       else:
         recordfunc += char
@@ -64,7 +67,7 @@ def run(pntr, variables, stack):
     elif recordopt != None:
       recordopt += char
       if recordopt in ["==", "=!", "=<", "=>"]:
-        jumpnextchar = operator(recordopt, stack, pntr.pos)
+        jumpnextchar = operator(recordopt, stack, pntr)
         recordopt = None
         skip = not jumpnextchar
       else:
@@ -77,33 +80,33 @@ def run(pntr, variables, stack):
           recordvar = None
           skip = True # this ends the variable
         else:
-          pass # ERROR: variable does not exist
+          utils.error(pntr, "variable does not exist", "name error")
       elif char == "=": # set var
         if len(stack) >= 1:
           variables[recordvar] = stack.pop(-1)
           recordvar = None
           skip = True # this ends the variable
         else:
-          utils.error(pntr.pos, "must have 1 item in the stack to set variable", "stack error")
+          utils.error(pntr, "must have 1 item in the stack to set variable", "stack error")
       elif char == "+": # if number will increment by 1
         try:
           variables[recordvar] += 1
           recordvar = None
           skip = True # this ends the variable
         except:
-          pass # ERROR: invalid type
+          utils.error(pntr, "variable is invalid type", "type error")
       elif char == "-": # if number will deincrement by 1
         try:
           variables[recordvar] -= 1
           recordvar = None
           skip = True # this ends the variable
         except:
-          pass # ERROR: invalid type
+          utils.error(pntr, "variable is invalid type", "type error")
       elif char in utils.alphabet + "_":
         recordvar += char
         skip = True
       else:
-        pass # ERROR: invalid character for ending variable
+        utils.error(pntr, "not a variable operator", "syntax error")
 
     elif recordnumber != None:
       if char in utils.numbers:
@@ -114,7 +117,7 @@ def run(pntr, variables, stack):
           recordnumber += "."
           skip = True
         else:
-          pass # ERROR: cannot have more that one period
+          utils.error(pntr, "invalid number", "value error")
       else:
         if "." in recordnumber: # if float
           stack.append(float(recordnumber))
@@ -138,18 +141,46 @@ def run(pntr, variables, stack):
         recordstring = ""
       elif char == "=":
         recordopt = "="
+        
       elif char == ":":
-        stack = functions.call("print", stack, pntr.pos)
+        stack = functions.call("print", stack, pntr)
+      elif char == "+":
+        stack = functions.call("add", stack, pntr)
+      elif char == "-":
+        stack = functions.call("subtract", stack, pntr)
+      elif char == "*":
+        stack = functions.call("multiply", stack, pntr)
+      elif char == "%":
+        stack = functions.call("divide", stack, pntr)
+      elif char == ")":
+        stack = functions.call("shiftright", stack, pntr)
+      elif char == "(":
+        stack = functions.call("shiftright", stack, pntr)
+        
       elif char == "[":
-        pass
+        beforedirection = copy.deepcopy(pntr.direction)
+        beforeposition = copy.deepcopy(pntr.pos)
+        pntr.direction = "left"
+        
+        stack, variables = run(pntr, variables, stack, functions)
+        
+        pntr.direction = beforedirection
+        pntr.pos = beforeposition
       elif char == "]":
-        pass
+        beforedirection = copy.deepcopy(pntr.direction)
+        beforeposition = copy.deepcopy(pntr.pos)
+        pntr.direction = "right"
+        
+        stack, variables = run(pntr, variables, stack, functions)
+        
+        pntr.direction = beforedirection
+        pntr.pos = beforeposition
       elif char == ";":
-        return stack # end the 'signal'
+        return stack, variables # end the 'signal'
       elif char in utils.numbers + ".":
         recordnumber = char
       elif char in utils.alphabet + "_":
         recordvar = char
       else:
         if char != " ": # null char
-          pass # ERROR: invalid char
+          utils.error(pntr, "invalid character", "syntax error")

@@ -34,7 +34,7 @@ class pointer(object):
       if char in [" ", "/", "\\", "_", "|", "{", "}"]:
         self.loopingcheck += 1
         if self.loopingcheck >= self.maxlooping:
-          utils.error(self.pos, "loop repeated over " + str(self.maxlooping) + " times", "loop error")
+          utils.error(self, "loop repeated over " + str(self.maxlooping) + " times", "loop error")
       else:
         self.loopingcheck = 0
       
@@ -47,14 +47,14 @@ class pointer(object):
       else:
         return char
     else:
-      utils.error(self.pos, "pointer tried to access a out of range character going " + self.direction, "range error")
+      utils.error(self, "pointer tried to access a out of range character going " + self.direction, "range error")
 
   def __getitem__(self, key):
     # key.start: x    key.stop: y
     if self.inrange(key.start, key.stop):
       return self.program[key.stop][key.start]
     else:
-      utils.error(self.pos, "pointer tried to access a out of range character going " + self.direction, "range error")
+      utils.error(self, "pointer tried to access a out of range character going " + self.direction, "range error")
 
   def inrange(self, x, y):
     if y < self.dims[1] and y >= 0:

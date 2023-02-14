@@ -10,3 +10,4 @@ src
 .replit
 /venv/
 *.nix
+build.py
