@@ -14,6 +14,12 @@ def operator(op, stack, pntr):
       rv = not first < second
     elif op == "=>":
       rv = not first > second
+    elif op == "=%":
+      rv = not (first % second == 0)
+    elif op == "=<<":
+      rv = not first <= second
+    elif op == "=>>":
+      rv = not first >= second
     else:
       utils.error(pntr, "invalid operator", "value error")
     return rv
