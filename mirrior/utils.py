@@ -1,3 +1,4 @@
+import ntpath
 import sys
 import os
 
@@ -28,3 +29,7 @@ def clear():
     os.system("cls")
   else:
     os.system("clear")
+
+def path_leaf(path):
+  head, tail = ntpath.split(path)
+  return tail or ntpath.basename(head)

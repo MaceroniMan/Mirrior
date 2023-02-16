@@ -3,15 +3,17 @@ import copy
 
 def operator(op, stack, pntr):
   if len(stack) >= 2:
+    second = stack.pop(-1)
+    first = stack.pop(-1)
     rv = None
     if op == "==":
-      rv = not stack.pop(-1) == stack.pop(-1)
+      rv = not first == second
     elif op == "=!":
-      rv = not stack.pop(-1) != stack.pop(-1)
+      rv = not first != second
     elif op == "=<":
-      rv = not stack.pop(-1) < stack.pop(-1)
+      rv = not first < second
     elif op == "=>":
-      rv = not stack.pop(-1) > stack.pop(-1)
+      rv = not first > second
     else:
       utils.error(pntr, "invalid operator", "value error")
     return rv

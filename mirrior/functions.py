@@ -1,3 +1,4 @@
+import random
 import utils
 
 # prints the top element of the stack and pops stack
@@ -22,8 +23,8 @@ def out(stack, pntr):
 # outputs the result of modulo
 def mod(stack, pntr):
   if len(stack) >= 2:
-    first = stack.pop(-1)
     second = stack.pop(-1)
+    first = stack.pop(-1)
     try:
       rvalue = first % second
     except TypeError:
@@ -37,8 +38,8 @@ def mod(stack, pntr):
 # outputs the result
 def add(stack, pntr):
   if len(stack) >= 2:
-    first = stack.pop(-1)
     second = stack.pop(-1)
+    first = stack.pop(-1)
     try:
       rvalue = first + second
     except TypeError:
@@ -52,8 +53,8 @@ def add(stack, pntr):
 # outputs the result
 def subtract(stack, pntr):
   if len(stack) >= 2:
-    first = stack.pop(-1)
     second = stack.pop(-1)
+    first = stack.pop(-1)
     try:
       rvalue = first - second
     except TypeError:
@@ -67,8 +68,8 @@ def subtract(stack, pntr):
 # outputs the result
 def multiply(stack, pntr):
   if len(stack) >= 2:
-    first = stack.pop(-1)
     second = stack.pop(-1)
+    first = stack.pop(-1)
     try:
       rvalue = first * second
     except TypeError:
@@ -82,8 +83,8 @@ def multiply(stack, pntr):
 # outputs the result
 def divide(stack, pntr):
   if len(stack) >= 2:
-    first = stack.pop(-1)
     second = stack.pop(-1)
+    first = stack.pop(-1)
     try:
       rvalue = first / second
     except TypeError:
@@ -134,6 +135,22 @@ def length(stack, pntr):
   stack.append(len(stack))
   return stack
 
+# pops the top 2 items of the stack
+# then makes a random number between items
+def rand_int(stack, pntr):
+  if len(stack) >= 2:
+    try:
+      second = stack.pop(-1)
+      first = stack.pop(-1)
+      stack.append(random.randint(first, second))
+      return stack
+    except TypeError:
+      utils.error(pntr, "randint function cannot be used with both '" + utils.stringtype(first) + "' and '" + utils.stringtype(second) + "'", "type error")
+    except ValueError:
+      utils.error(pntr, "randint function bad range", "type error")
+  else:
+    utils.error(pntr, "randint function needs at least 2 items in stack", "stack error")
+
 # prompts the user for a input
 # does auto-type converting
 def prompt(stack, pntr):
@@ -161,7 +178,8 @@ class fcaller(object):
       "shiftright" : shift_right,
       "shiftleft" : shift_left,
       "len" : length,
-      "in" : prompt
+      "in" : prompt,
+      "randint" : rand_int
     }
 
   def call(self, name, stack, pntr):
@@ -171,4 +189,4 @@ class fcaller(object):
       
       return rvalue
     else:
-      return False
+      utils.error(pntr, "function name does not exist", "name error")
