@@ -21,7 +21,7 @@ def stringtype(value):
     return "string"
   elif isinstance(value, int):
     return "int"
-  elif isinstance(value, int):
+  elif isinstance(value, float):
     return "float"
 
 def clear():

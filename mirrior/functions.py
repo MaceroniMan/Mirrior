@@ -9,9 +9,9 @@ def out_pop(stack, pntr):
     return stack
   else:
     utils.error(pntr, "print function needs at least 1 item in stack", "stack error")
-
+    
 # prints the top element of the stack does not pop stack
-# does not print a newline
+# prints a newline
 def out(stack, pntr):
   if len(stack) >= 1:
     print(stack[-1], end="", flush=True)
@@ -43,7 +43,7 @@ def add(stack, pntr):
     try:
       rvalue = first + second
     except TypeError:
-      utils.error(pntr, "subtract function cannot be used with both '" + utils.stringtype(first) + "' and '" + utils.stringtype(second) + "'", "type error")
+      utils.error(pntr, "add function cannot be used with both '" + utils.stringtype(first) + "' and '" + utils.stringtype(second) + "'", "type error")
     stack.append(rvalue)
     return stack
   else:
@@ -152,7 +152,7 @@ def rand_int(stack, pntr):
     utils.error(pntr, "randint function needs at least 2 items in stack", "stack error")
 
 # prompts the user for a input
-# does auto-type converting
+# does auto-type converting to int, float and then str
 def prompt(stack, pntr):
   inpt = input("")
   try:
@@ -163,6 +163,24 @@ def prompt(stack, pntr):
     except ValueError:
       stack.append(str(inpt))
   return stack
+
+# delete the top item of the stack
+def delete(stack, pntr):
+  if len(stack) >= 1:
+    stack.pop(-1)
+    return stack
+  else:
+    utils.error(pntr, "delete function needs at least 1 item in stack", "stack error")
+
+# turns the top item of the stack into a string
+# returns the stack
+def stringify(stack, pntr):
+  if len(stack) >= 1:
+    before = stack.pop(-1)
+    stack.append(str(before))
+    return stack
+  else:
+    utils.error(pntr, "stringify function needs at least 1 item in stack", "stack error")
 
 class fcaller(object):
   def __init__(self):
@@ -179,7 +197,9 @@ class fcaller(object):
       "shiftleft" : shift_left,
       "len" : length,
       "in" : prompt,
-      "randint" : rand_int
+      "randint" : rand_int,
+      "del" : delete,
+      "str" : stringify
     }
 
   def call(self, name, stack, pntr):

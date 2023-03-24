@@ -74,7 +74,7 @@ def run(pntr, variables, stack, functions):
 
     elif recordopt != None:
       recordopt += char
-      if recordopt in ["==", "=!", "=<", "=>"]:
+      if recordopt in ["==", "=!", "=<", "=>", "=%", "=<<", "=>>"]:
         jumpnextchar = operator(recordopt, stack, pntr)
         recordopt = None
         skip = not jumpnextchar
@@ -152,6 +152,10 @@ def run(pntr, variables, stack, functions):
         
       elif char == ":":
         stack = functions.call("print", stack, pntr)
+      elif char == "&":
+        stack = functions.call("copy", stack, pntr)
+      elif char == "$":
+        stack = functions.call("str", stack, pntr)
       elif char == "+":
         stack = functions.call("add", stack, pntr)
       elif char == "-":
