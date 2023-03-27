@@ -142,7 +142,7 @@ def rand_int(stack, pntr):
     try:
       second = stack.pop(-1)
       first = stack.pop(-1)
-      stack.append(random.randint(first, second))
+      stack.append(float(random.randint(first, second)))
       return stack
     except TypeError:
       utils.error(pntr, "randint function cannot be used with both '" + utils.stringtype(first) + "' and '" + utils.stringtype(second) + "'", "type error")
@@ -156,12 +156,9 @@ def rand_int(stack, pntr):
 def prompt(stack, pntr):
   inpt = input("")
   try:
-    stack.append(int(inpt))
+    stack.append(float(inpt))
   except ValueError:
-    try:
-      stack.append(float(inpt))
-    except ValueError:
-      stack.append(str(inpt))
+    stack.append(str(inpt))
   return stack
 
 # delete the top item of the stack
@@ -182,6 +179,19 @@ def stringify(stack, pntr):
   else:
     utils.error(pntr, "stringify function needs at least 1 item in stack", "stack error")
 
+# turns the top item of the stack into a string
+# returns the stack
+def numify(stack, pntr):
+  if len(stack) >= 1:
+    before = stack.pop(-1)
+    try:
+      stack.append(float(before))
+    except ValueError:
+      utils.error(pntr, before + " value cannot be converted to a float datatype", "stack error")
+    return stack
+  else:
+    utils.error(pntr, "numify function needs at least 1 item in stack", "stack error")
+
 class fcaller(object):
   def __init__(self):
     self.fctns = {
@@ -199,7 +209,8 @@ class fcaller(object):
       "in" : prompt,
       "randint" : rand_int,
       "del" : delete,
-      "str" : stringify
+      "str" : stringify,
+      "num" : numify
     }
 
   def call(self, name, stack, pntr):

@@ -5,7 +5,7 @@ import os
 # variables
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 numbers = "1234567890"
-opts = "=><!"
+opts = "=><!%"
 
 def error(pntr, message, etype):
   position = pntr.pos
@@ -19,8 +19,6 @@ def error(pntr, message, etype):
 def stringtype(value):
   if isinstance(value, str):
     return "string"
-  elif isinstance(value, int):
-    return "int"
   elif isinstance(value, float):
     return "float"
 

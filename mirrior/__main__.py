@@ -1,12 +1,12 @@
 import interpreter
 import pointer
 import functions
+import utils
 
 import sys
 
 # note: the stack of the program is as follows:
 # the end of the stack list is the top of the stack
-
 
 if __name__ == "__main__":
   args = sys.argv[1:]
@@ -22,4 +22,8 @@ if __name__ == "__main__":
       sys.exit(0)
 
     pntr = pointer.pointer(ftext)
-    interpreter.run(pntr, {}, [], functions.fcaller())
+    try:
+      interpreter.run(pntr, {}, [], functions.fcaller())
+    except KeyboardInterrupt:
+      print("\r", end="")
+      utils.error(pntr, "", "keyboard interrupt")

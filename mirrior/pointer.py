@@ -34,7 +34,7 @@ class pointer(object):
       if char in [" ", "/", "\\", "_", "|", "{", "}"]:
         self.loopingcheck += 1
         if self.loopingcheck >= self.maxlooping:
-          utils.error(self, "loop repeated over " + str(self.maxlooping) + " times", "loop error")
+          utils.error(self, "blank loop repeated over " + str(self.maxlooping) + " times", "loop error")
       else:
         self.loopingcheck = 0
       

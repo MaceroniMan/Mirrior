@@ -29,11 +29,35 @@ def operator(op, stack, pntr):
 # sets up so that it will have skipped one character
 def skipnextchar(pntr):
   pntr.allowchange = False
-  char = pntr.next()
-  
-  while char == " ":
-    char = pntr.next()
 
+  isstring = False
+  isfunction = False
+  isoperator = False
+  
+  done = False
+  while not done:
+    char = pntr.next()
+    
+    if isfunction:
+      if not char in utils.alphabet: # a function just finished
+        done = True
+    elif isoperator:
+      if not char in utils.opts:
+        done = True
+    elif char == "\"":
+      if isstring: # a string just finished
+        done = True
+      else:
+        isstring = True
+    elif char == "@":
+      isfunction = True # function just started
+    elif char == "=":
+      isoperator = True
+    else:
+      # the character is not in a string and its not whitespace
+      if not isstring and char != " ":
+        done = True
+  
   pntr.allowchange = True
 
 def run(pntr, variables, stack, functions):
@@ -45,13 +69,13 @@ def run(pntr, variables, stack, functions):
   skip = False
   jumpnextchar = False
 
-  while True:
+  while True:    
     char = pntr.next()
     if char == None: # if it was mirrored
       continue
 
-    if len(stack) > 999:
-      utils.error(pntr, "stack cannot exceed 999 values", "stack error")
+    if len(stack) > 1024:
+      utils.error(pntr, "stack cannot exceed 1024 values", "stack error")
 
     # respond to current records
     if recordstring != None:
@@ -79,7 +103,10 @@ def run(pntr, variables, stack, functions):
         recordopt = None
         skip = not jumpnextchar
       else:
-        skip = True
+        if not char in utils.opts:
+          utils.error(pntr, "invalid operator", "value error")
+        else:
+          skip = True
 
     elif recordvar != None:
       if char == "?": # get var
@@ -127,14 +154,11 @@ def run(pntr, variables, stack, functions):
         else:
           utils.error(pntr, "invalid number", "value error")
       else:
-        if "." in recordnumber: # if float
-          stack.append(float(recordnumber))
-        else:
-          stack.append(int(recordnumber))
+        stack.append(float(recordnumber))
         recordnumber = None
         
     # then respond to actual character
-    if skip:
+    if skip: # if the current character was already evaluated
       skip = False
     elif jumpnextchar:
       skipnextchar(pntr)
