@@ -28,12 +28,25 @@ def mod(stack, pntr):
     try:
       rvalue = first % second
     except TypeError:
-      utils.error(pntr, "subtract function cannot be used with both '" + utils.stringtype(first) + "' and '" + utils.stringtype(second) + "'", "type error")
+      utils.error(pntr, "modulo function cannot be used with both '" + utils.stringtype(first) + "' and '" + utils.stringtype(second) + "'", "type error")
     stack.append(rvalue)
     return stack
   else:
     utils.error(pntr, "modulo function needs at least 2 items in stack", "stack error")
-    
+
+# takes the absolute value of the top item of the stack
+# returns that value
+def doabs(stack, pntr):
+  if len(stack) >= 1:
+    value = stack.pop(-1)
+    try:
+      stack.append(abs(value))
+    except TypeError:
+      utils.error(pntr, "subtract function cannot be used with a '" + utils.stringtype(value) + "'", "type error")
+    return stack
+  else:
+    utils.error(pntr, "modulo function needs at least 2 items in stack", "stack error")
+
 # adds the top two elements of the stack
 # outputs the result
 def add(stack, pntr):
@@ -107,7 +120,11 @@ def copy(stack, pntr):
 # outputs the result
 def shift_right(stack, pntr):
   if len(stack) >= 1:
-    shiftnum = stack.pop(-1)
+    first = stack.pop(-1)
+    try:
+      shiftnum = int(first)
+    except TypeError:
+      utils.error(pntr, "shift function cannot be used with '" + utils.stringtype(first) + "'", "type error")
     if len(stack) >= shiftnum:
       p = stack[-shiftnum:]
       return stack[:-shiftnum] + p[1:] + p[:1]
@@ -120,7 +137,11 @@ def shift_right(stack, pntr):
 # outputs the result
 def shift_left(stack, pntr):
   if len(stack) >= 1:
-    shiftnum = stack.pop(-1)
+    first = stack.pop(-1)
+    try:
+      shiftnum = int(first)
+    except TypeError:
+      utils.error(pntr, "shift function cannot be used with '" + utils.stringtype(first) + "'", "type error")
     if len(stack) >= shiftnum:
       p = stack[-shiftnum:]
       return stack[:-shiftnum] + p[-1:] + p[:-1]
@@ -132,7 +153,7 @@ def shift_left(stack, pntr):
 # adds the length of the stack to the stack
 # NOTE: does not include added value
 def length(stack, pntr):
-  stack.append(len(stack))
+  stack.append(float(len(stack)))
   return stack
 
 # pops the top 2 items of the stack
@@ -196,6 +217,7 @@ class fcaller(object):
   def __init__(self):
     self.fctns = {
       "mod" : mod,
+      "abs" : doabs,
       "print" : out_pop,
       "out" : out,
       "add" : add,
@@ -210,7 +232,7 @@ class fcaller(object):
       "randint" : rand_int,
       "del" : delete,
       "str" : stringify,
-      "num" : numify
+      "num" : numify,
     }
 
   def call(self, name, stack, pntr):

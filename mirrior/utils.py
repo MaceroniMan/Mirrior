@@ -20,7 +20,7 @@ def stringtype(value):
   if isinstance(value, str):
     return "string"
   elif isinstance(value, float):
-    return "float"
+    return "num"
 
 def clear():
   if os.name == "nt":

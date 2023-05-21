@@ -11,4 +11,3 @@ src
 /venv/
 *.nix
 build.py
-.mirrior

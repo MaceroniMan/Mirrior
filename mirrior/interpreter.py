@@ -2,7 +2,17 @@ import utils
 import copy
 
 def operator(op, stack, pntr):
-  if len(stack) >= 2:
+  if op == "=s":
+    if len(stack) >= 1:
+      return utils.stringtype(stack.pop(-1)) == "string"
+    else:
+      utils.error(pntr, "compare type operators need at least 1 value in stack", "stack error")
+  elif op == "=n":
+    if len(stack) >= 1:
+      return utils.stringtype(stack.pop(-1)) == "num"
+    else:
+      utils.error(pntr, "compare type operators need at least 1 value in stack", "stack error")
+  elif len(stack) >= 2:
     second = stack.pop(-1)
     first = stack.pop(-1)
     rv = None
@@ -33,17 +43,37 @@ def skipnextchar(pntr):
   isstring = False
   isfunction = False
   isoperator = False
+  isnumber = False
+  isvariable = False
+
+  prevpoint = None
   
   done = False
   while not done:
-    char = pntr.next()
+    # make a backup of point incase the skip ever needs to go backward
+    prevpoint = pntr.pos.copy()
     
-    if isfunction:
+    char = pntr.next()
+
+    if isstring:
+      if char == "\"":
+        done = True
+    elif isfunction:
       if not char in utils.alphabet: # a function just finished
+        pntr.pos = prevpoint.copy()
         done = True
     elif isoperator:
       if not char in utils.opts:
+        pntr.pos = prevpoint.copy()
         done = True
+    elif isnumber:
+      if not char in utils.numbers + "e":
+        pntr.pos = prevpoint.copy()
+        done = True
+    elif isvariable:
+      if char in ["?", "="]:
+        done = True
+    
     elif char == "\"":
       if isstring: # a string just finished
         done = True
@@ -53,6 +83,10 @@ def skipnextchar(pntr):
       isfunction = True # function just started
     elif char == "=":
       isoperator = True
+    elif char in utils.numbers:
+      isnumber = True
+    elif char in utils.alphabet:
+      isvariable = True
     else:
       # the character is not in a string and its not whitespace
       if not isstring and char != " ":
@@ -60,7 +94,7 @@ def skipnextchar(pntr):
   
   pntr.allowchange = True
 
-def run(pntr, variables, stack, functions):
+def run(pntr, variables, stack, functions, max_stack):
   recordstring = None
   recordfunc = None
   recordopt = None
@@ -69,13 +103,13 @@ def run(pntr, variables, stack, functions):
   skip = False
   jumpnextchar = False
 
-  while True:    
+  while True:
     char = pntr.next()
     if char == None: # if it was mirrored
       continue
 
-    if len(stack) > 1024:
-      utils.error(pntr, "stack cannot exceed 1024 values", "stack error")
+    if len(stack) > max_stack:
+      utils.error(pntr, "stack cannot exceed " + str(max_stack) + " values", "stack error")
 
     # respond to current records
     if recordstring != None:
@@ -98,12 +132,12 @@ def run(pntr, variables, stack, functions):
 
     elif recordopt != None:
       recordopt += char
-      if recordopt in ["==", "=!", "=<", "=>", "=%", "=<<", "=>>"]:
+      if recordopt in ["==", "=!", "=<", "=>", "=%", "=<<", "=>>", "=s", "=n"]:
         jumpnextchar = operator(recordopt, stack, pntr)
         recordopt = None
         skip = not jumpnextchar
       else:
-        if not char in utils.opts:
+        if not char in utils.opts + "sn":
           utils.error(pntr, "invalid operator", "value error")
         else:
           skip = True
