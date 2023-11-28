@@ -94,7 +94,7 @@ def skipnextchar(pntr):
   
   pntr.allowchange = True
 
-def run(pntr, variables, stack, functions, max_stack):
+def run(pntr, variables, stacks, stacknum, functions, max_stack):
   recordstring = None
   recordfunc = None
   recordopt = None
@@ -108,9 +108,11 @@ def run(pntr, variables, stack, functions, max_stack):
     if char == None: # if it was mirrored
       continue
 
-    if len(stack) > max_stack:
+    if len(stacks[stacknum]) > max_stack:
       utils.error(pntr, "stack cannot exceed " + str(max_stack) + " values", "stack error")
 
+    stack = stacks[stacknum] # pass by reference
+    
     # respond to current records
     if recordstring != None:
       if char == '"':
@@ -181,6 +183,14 @@ def run(pntr, variables, stack, functions, max_stack):
       if char in utils.numbers:
         recordnumber += char
         skip = True
+      elif char == "|":
+        if "." in recordnumber:
+          utils.error(pntr, "invalid number for stack change", "value error")
+        stacknum = int(recordnumber)
+        if not stacknum in stacks: 
+          stacks[stacknum] = []
+        stack = stacks[stacknum] # set the new stack variable
+        skip = True
       elif char == ".":
         if not "." in recordnumber:
           recordnumber += "."
@@ -207,7 +217,7 @@ def run(pntr, variables, stack, functions, max_stack):
         recordstring = ""
       elif char == "=":
         recordopt = "="
-        
+
       elif char == ":":
         stack = functions.call("print", stack, pntr)
       elif char == "&":
@@ -222,6 +232,8 @@ def run(pntr, variables, stack, functions, max_stack):
         stack = functions.call("multiply", stack, pntr)
       elif char == "%":
         stack = functions.call("divide", stack, pntr)
+      elif char == "~":
+        stack = functions.call("mod", stack, pntr)
       elif char == ")":
         stack = functions.call("shiftright", stack, pntr)
       elif char == "(":
@@ -241,15 +253,15 @@ def run(pntr, variables, stack, functions, max_stack):
         beforeposition = copy.deepcopy(pntr.pos)
         pntr.direction = "right"
         
-        stack, variables = run(pntr, variables, stack, functions)
+        stack, variables = run(pntr, variables, stacks, stacknum, functions, max_stack)
         
         pntr.direction = beforedirection
         pntr.pos = beforeposition
       elif char == ";":
         return stack, variables # end the 'signal'
-      elif char in utils.numbers + ".":
+      elif char in utils.numbers + ".": # start a number
         recordnumber = char
-      elif char in utils.alphabet + "_":
+      elif char in utils.alphabet + "_": # start a variable
         recordvar = char
       else:
         if char != " ": # null char

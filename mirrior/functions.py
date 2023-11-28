@@ -9,15 +9,6 @@ def out_pop(stack, pntr):
     return stack
   else:
     utils.error(pntr, "print function needs at least 1 item in stack", "stack error")
-    
-# prints the top element of the stack does not pop stack
-# prints a newline
-def out(stack, pntr):
-  if len(stack) >= 1:
-    print(stack[-1], end="", flush=True)
-    return stack
-  else:
-    utils.error(pntr, "out function needs at least 1 item in stack", "stack error")
 
 # modulos top 2 elements of stack
 # outputs the result of modulo
@@ -42,10 +33,10 @@ def doabs(stack, pntr):
     try:
       stack.append(abs(value))
     except TypeError:
-      utils.error(pntr, "subtract function cannot be used with a '" + utils.stringtype(value) + "'", "type error")
+      utils.error(pntr, "abs function cannot be used with a '" + utils.stringtype(value) + "'", "type error")
     return stack
   else:
-    utils.error(pntr, "modulo function needs at least 2 items in stack", "stack error")
+    utils.error(pntr, "abs function needs at least 2 items in stack", "stack error")
 
 # adds the top two elements of the stack
 # outputs the result
@@ -173,7 +164,7 @@ def rand_int(stack, pntr):
     utils.error(pntr, "randint function needs at least 2 items in stack", "stack error")
 
 # prompts the user for a input
-# does auto-type converting to int, float and then str
+# does auto-type converting to number and then string
 def prompt(stack, pntr):
   inpt = input("")
   try:
@@ -219,7 +210,6 @@ class fcaller(object):
       "mod" : mod,
       "abs" : doabs,
       "print" : out_pop,
-      "out" : out,
       "add" : add,
       "subtract" : subtract,
       "multiply" : multiply,
@@ -229,10 +219,10 @@ class fcaller(object):
       "shiftleft" : shift_left,
       "len" : length,
       "in" : prompt,
-      "randint" : rand_int,
+      "rint" : rand_int,
       "del" : delete,
       "str" : stringify,
-      "num" : numify,
+      "num" : numify
     }
 
   def call(self, name, stack, pntr):

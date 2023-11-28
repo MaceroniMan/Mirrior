@@ -28,7 +28,10 @@ if __name__ == "__main__":
 
   pntr = pointer.pointer(ftext, args.maxloop)
   try:
-    interpreter.run(pntr, {}, [], functions.fcaller(), args.stacksize)
+    stacks = {
+      0: []
+    }
+    interpreter.run(pntr, {}, stacks, 0, functions.fcaller(), args.stacksize)
   except KeyboardInterrupt:
     print("\r", end="")
     utils.error(pntr, "", "keyboard interrupt")

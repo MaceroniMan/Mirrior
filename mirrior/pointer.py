@@ -31,14 +31,14 @@ class pointer(object):
     if self.inrange(self.pos[0], self.pos[1]):
       char = self[self.pos[0]:self.pos[1]]
 
-      if char in [" ", "/", "\\", "_", "|", "{", "}"]:
+      if char in [" ", "/", "\\", "{", "}", "^"]:
         self.loopingcheck += 1
         if self.loopingcheck >= self.maxlooping:
           utils.error(self, "blank loop repeated over " + str(self.maxlooping) + " times", "loop error")
       else:
         self.loopingcheck = 0
       
-      if char in ["/", "\\", "_",  "|", "{", "}"]:
+      if char in ["/", "\\", "{", "}", "^"]:
         if self.allowchange:
           self.mirror(char)
           return None # if it was redirected
@@ -79,18 +79,6 @@ class pointer(object):
         "up" : "left",
         "down" : "right"
       },
-      "|" : {
-        "right" : "left",
-        "left" : "right",
-        "up" : "up",
-        "down" : "down"
-      },
-      "_" : {
-        "right" : "right",
-        "left" : "left",
-        "up" : "down",
-        "down" : "up"
-      },
       "}" : {
         "right" : "right",
         "left" : "right",
@@ -103,6 +91,12 @@ class pointer(object):
         "up" : "left",
         "down" : "left"
       },
+      "^" : {
+        "right" : "up",
+        "left" : "up",
+        "up" : "up",
+        "down" : "up"
+      }
     }
     self.direction = directions[char][self.direction]
 
